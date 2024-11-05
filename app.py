@@ -34,13 +34,13 @@ def generate_comment(alert):
         f"Zスコア: {alert['z_score']}\n\n"
         "この結果を解釈し、簡単なコメントを作成してください。"
     )
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model="gpt-4-turbo",  # ChatGPT-4モデルの指定
+        messages=[{"role": "user", "content": prompt}],
         max_tokens=100,
         temperature=0.7
     )
-    return response.choices[0].text.strip()
+    return response['choices'][0]['message']['content'].strip()
 
 @app.route('/')
 def index():
@@ -65,6 +65,7 @@ def upload_file():
         
         outbreak_alerts = detect_outbreak_zscore(df)
         
+        # 各アラートに対してChatGPT APIでコメント生成
         for alert in outbreak_alerts:
             alert['comment'] = generate_comment(alert)
         
