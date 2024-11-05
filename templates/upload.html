@@ -4,13 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <title>CSVファイルアップロード</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .upload-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 14px;
+            color: #555;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 15px auto;
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>薬剤耐性データ アップロード</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <label for="file">CSVファイルを選択:</label>
-        <input type="file" name="file" id="file" accept=".csv">
-        <button type="submit">アップロード</button>
-    </form>
+    <div class="upload-container">
+        <h1>薬剤耐性データ アップロード</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label for="file">CSVファイルを選択:</label>
+            <input type="file" name="file" id="file" accept=".csv">
+            <button type="submit">アップロード</button>
+        </form>
+    </div>
 </body>
 </html>
