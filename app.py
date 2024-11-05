@@ -1,13 +1,20 @@
-
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import pandas as pd
 from scipy.stats import zscore
 import os
+import openai
+from dotenv import load_dotenv  # dotenvをインポート
 from werkzeug.utils import secure_filename
+
+# .envファイルの読み込み
+load_dotenv()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# OpenAI APIキーの取得
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def detect_outbreak_zscore(df, z_threshold=2):
     df['month_year'] = df['date'].dt.to_period('M')
@@ -16,6 +23,24 @@ def detect_outbreak_zscore(df, z_threshold=2):
     
     outbreak_alerts = resistance_rate[resistance_rate['z_score'] > z_threshold].to_dict(orient='records')
     return outbreak_alerts
+
+def generate_comment(alert):
+    prompt = (
+        f"以下の耐性データに基づいてコメントを作成してください：\n\n"
+        f"細菌種: {alert['bacteria']}\n"
+        f"抗生物質: {alert['antibiotic']}\n"
+        f"月: {alert['month_year']}\n"
+        f"耐性率: {alert['resistance_rate']}\n"
+        f"Zスコア: {alert['z_score']}\n\n"
+        "この結果を解釈し、簡単なコメントを作成してください。"
+    )
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=100,
+        temperature=0.7
+    )
+    return response.choices[0].text.strip()
 
 @app.route('/')
 def index():
@@ -40,6 +65,9 @@ def upload_file():
         
         outbreak_alerts = detect_outbreak_zscore(df)
         
+        for alert in outbreak_alerts:
+            alert['comment'] = generate_comment(alert)
+        
         return render_template('results.html', alerts=outbreak_alerts)
     
     return redirect(request.url)
@@ -62,6 +90,9 @@ def api_upload():
         df['date'] = pd.to_datetime(df['date'])
         
         outbreak_alerts = detect_outbreak_zscore(df)
+        
+        for alert in outbreak_alerts:
+            alert['comment'] = generate_comment(alert)
         
         return jsonify({"outbreak_alerts": outbreak_alerts})
     
