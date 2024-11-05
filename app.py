@@ -35,7 +35,7 @@ def generate_comment(alert):
         "この結果を解釈し、簡単なコメントを作成してください。"
     )
     response = openai.ChatCompletion.create(
-        model="gpt-4-turbo",  # ChatGPT-4モデルの指定
+        model="gpt-3.5-turbo",  # 利用可能なモデルに変更
         messages=[{"role": "user", "content": prompt}],
         max_tokens=100,
         temperature=0.7
