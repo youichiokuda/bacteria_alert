@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>アラート結果</title>
+</head>
+<body>
+    <h1>アラート結果</h1>
+    {% if alerts %}
+        <ul>
+            {% for alert in alerts %}
+                <li>{{ alert }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>異常な増加は検出されませんでした。</p>
+    {% endif %}
+    <a href="/">別のファイルをアップロード</a>
+</body>
+</html>

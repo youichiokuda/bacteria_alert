@@ -1,0 +1,16 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CSVファイルアップロード</title>
+</head>
+<body>
+    <h1>薬剤耐性データ アップロード</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">CSVファイルを選択:</label>
+        <input type="file" name="file" id="file" accept=".csv">
+        <button type="submit">アップロード</button>
+    </form>
+</body>
+</html>
