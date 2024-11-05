@@ -5,21 +5,18 @@ from scipy.stats import zscore
 
 app = Flask(__name__)
 
-# データ読み込み
+# データ読み込みと処理
 data_path = os.path.join("data", "sensitivity_results_sample.csv")
 df = pd.read_csv(data_path)
 df['date'] = pd.to_datetime(df['date'])
 df['month_year'] = df['date'].dt.to_period('M')
 
-# 抵抗率の計算
 resistance_rate = df.groupby(['bacteria', 'antibiotic', 'month_year'])['resistance'].apply(lambda x: (x == 'R').mean()).reset_index(name='resistance_rate')
 
-# zスコアを使用したアウトブレイク兆候検出
 def detect_outbreak_zscore(resistance_df, z_threshold=2):
     outbreak_alerts = []
     resistance_df['z_score'] = resistance_df.groupby(['bacteria', 'antibiotic'])['resistance_rate'].transform(lambda x: zscore(x, nan_policy='omit'))
     
-    # zスコアが指定の閾値を超える場合を抽出
     for _, row in resistance_df.iterrows():
         if row['z_score'] > z_threshold:
             outbreak_alerts.append({
@@ -44,4 +41,5 @@ def api_data():
     return jsonify({"alerts": alerts, "outbreak_alerts": outbreak_alerts})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
