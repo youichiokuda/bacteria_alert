@@ -2,3 +2,5 @@
 Flask
 pandas
 scipy
+openai
+python-dotenv
