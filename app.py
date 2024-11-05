@@ -34,13 +34,17 @@ def generate_comment(alert):
         f"Zスコア: {alert['z_score']}\n\n"
         "この結果を解釈し、簡単なコメントを作成してください。"
     )
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # 利用可能なモデルに変更
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=100,
-        temperature=0.7
-    )
-    return response['choices'][0]['message']['content'].strip()
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # 利用可能なモデルに変更
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100,
+            temperature=0.7
+        )
+        return response['choices'][0]['message']['content'].strip()
+    except openai.error.RateLimitError:
+        # クォータ制限を超えた場合のエラーメッセージ
+        return "クォータ制限に達しました。コメントの生成ができませんでした。"
 
 @app.route('/')
 def index():
