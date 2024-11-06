@@ -7,12 +7,13 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow-y: auto;
+            align-items: flex-start;  /* 画面上部から表示 */
+            min-height: 100vh;
+            overflow-y: auto;  /* 縦スクロールを許可 */
         }
         .results-container {
             background-color: #ffffff;
@@ -20,8 +21,8 @@
             margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            max-width: 90%;
+            width: 90%;
+            max-width: 600px;
         }
         h1 {
             color: #333;
