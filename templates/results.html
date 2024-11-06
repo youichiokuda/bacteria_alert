@@ -99,7 +99,7 @@
                     <p><strong>月:</strong> {{ alert['month_year'] }}</p>
                     <p><strong>耐性率:</strong> {{ alert['resistance_rate'] }}</p>
                     <p><strong>Zスコア:</strong> {{ alert['z_score'] }}</p>
-                    <p><strong>コメント:</strong> {{ alert['comment'] }}</p>
+                    
                     <div class="detail-link">
                         <a href="{{ url_for('show_outbreak_details', bacteria=alert['bacteria'], antibiotic=alert['antibiotic'], month=alert['month_year']) }}">
                             詳細グラフを見る
