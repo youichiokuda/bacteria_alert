@@ -4,41 +4,31 @@
     <meta charset="UTF-8">
     <title>アラート結果</title>
     <style>
-        /* 全体のスタイル調整 */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+        body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
-            scroll-behavior: smooth;  /* スムーズスクロールの有効化 */
-        }
-        
-        /* スクロール制限解除 */
-        body {
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            overflow-y: auto;  /* 縦方向のスクロールを許可 */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto;
         }
-
         .results-container {
             background-color: #ffffff;
             padding: 30px;
-            margin-top: 20px;  /* 画面の上部にスペースを確保 */
+            margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
             max-width: 90%;
         }
-
         h1 {
             color: #333;
             font-size: 22px;
             margin-bottom: 20px;
             text-align: center;
         }
-
         .alert-item {
             background-color: #f9f9f9;
             border-left: 5px solid #ff6b6b;
@@ -46,19 +36,20 @@
             padding: 10px;
             border-radius: 5px;
         }
-
         .alert-item p {
             margin: 5px 0;
             font-size: 14px;
             color: #444;
         }
-
+        .alert-item .comment {
+            color: #0066cc;
+            font-style: italic;
+        }
         .no-alerts {
             text-align: center;
             color: #777;
             font-size: 16px;
         }
-
         .upload-again {
             display: block;
             margin-top: 20px;
@@ -67,7 +58,6 @@
             font-size: 14px;
             text-decoration: none;
         }
-
         .upload-again:hover {
             text-decoration: underline;
         }
@@ -84,6 +74,7 @@
                     <p><strong>月:</strong> {{ alert['month_year'] }}</p>
                     <p><strong>耐性率:</strong> {{ alert['resistance_rate'] }}</p>
                     <p><strong>Zスコア:</strong> {{ alert['z_score'] }}</p>
+                    <p class="comment"><strong>コメント:</strong> {{ alert['comment'] }}</p>
                 </div>
             {% endfor %}
         {% else %}
