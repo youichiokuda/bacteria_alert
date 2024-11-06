@@ -4,7 +4,93 @@
     <meta charset="UTF-8">
     <title>アラート結果</title>
     <style>
-        /* CSSは省略 */
+        /* 基本設定 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .results-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* カードスタイルのアラート */
+        .alert-item {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alert-item h2 {
+            font-size: 18px;
+            color: #555;
+            margin: 0;
+            margin-bottom: 5px;
+        }
+
+        .alert-item p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .alert-item strong {
+            color: #333;
+        }
+
+        /* 詳細リンクボタン */
+        .detail-link {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .detail-link a {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .detail-link a:hover {
+            background-color: #45a049;
+        }
+
+        /* フッターリンク */
+        .footer-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -13,24 +99,27 @@
         {% if alerts %}
             {% for alert in alerts %}
                 <div class="alert-item">
-                    <p><strong>細菌種:</strong> {{ alert['bacteria'] }}</p>
-                    <p><strong>抗生物質:</strong> {{ alert['antibiotic'] }}</p>
+                    <h2>細菌種: {{ alert['bacteria'] }} × 抗生物質: {{ alert['antibiotic'] }}</h2>
                     <p><strong>月:</strong> {{ alert['month_year'] }}</p>
                     <p><strong>耐性率:</strong> {{ alert['resistance_rate'] }}</p>
                     <p><strong>Zスコア:</strong> {{ alert['z_score'] }}</p>
                     <p><strong>コメント:</strong> {{ alert['comment'] }}</p>
                     <!-- 詳細リンク -->
-                    <p>
+                    <div class="detail-link">
                         <a href="{{ url_for('show_outbreak_details', bacteria=alert['bacteria'], antibiotic=alert['antibiotic'], month=alert['month_year']) }}">
                             詳細グラフを見る
                         </a>
-                    </p>
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
             <p class="no-alerts">異常な増加は検出されませんでした。</p>
         {% endif %}
-        <a href="/" class="upload-again">別のファイルをアップロード</a>
+        
+        <!-- フッターのリンク -->
+        <div class="footer-link">
+            <a href="/">別のファイルをアップロード</a>
+        </div>
     </div>
 </body>
 </html>
