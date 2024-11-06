@@ -23,7 +23,7 @@ def detect_outbreak_zscore(df, z_threshold=2):
     df['date'] = pd.to_datetime(df['date'])
     df['month_year'] = df['date'].dt.to_period('M')
     
-    # "I" を "S" と同じ扱いにして耐性率を計算
+    # "I" を "S" として扱い、耐性率を計算
     resistance_rate = df.assign(
         resistance=df['resistance'].replace('I', 'S')  # "I" を "S" に置換
     ).groupby(['bacteria', 'antibiotic', 'month_year'])['resistance'].apply(lambda x: (x == 'R').mean()).reset_index(name='resistance_rate')
