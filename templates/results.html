@@ -4,64 +4,7 @@
     <meta charset="UTF-8">
     <title>アラート結果</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;  /* 画面上部から表示 */
-            min-height: 100vh;
-            overflow-y: auto;  /* 縦スクロールを許可 */
-        }
-        .results-container {
-            background-color: #ffffff;
-            padding: 30px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-        }
-        h1 {
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .alert-item {
-            background-color: #f9f9f9;
-            border-left: 5px solid #ff6b6b;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .alert-item p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #444;
-        }
-        .alert-item .comment {
-            color: #0066cc;
-            font-style: italic;
-        }
-        .no-alerts {
-            text-align: center;
-            color: #777;
-            font-size: 16px;
-        }
-        .upload-again {
-            display: block;
-            margin-top: 20px;
-            text-align: center;
-            color: #4CAF50;
-            font-size: 14px;
-            text-decoration: none;
-        }
-        .upload-again:hover {
-            text-decoration: underline;
-        }
+        /* CSSは省略 */
     </style>
 </head>
 <body>
@@ -75,7 +18,13 @@
                     <p><strong>月:</strong> {{ alert['month_year'] }}</p>
                     <p><strong>耐性率:</strong> {{ alert['resistance_rate'] }}</p>
                     <p><strong>Zスコア:</strong> {{ alert['z_score'] }}</p>
-                    <p class="comment"><strong>コメント:</strong> {{ alert['comment'] }}</p>
+                    <p><strong>コメント:</strong> {{ alert['comment'] }}</p>
+                    <!-- 詳細リンク -->
+                    <p>
+                        <a href="{{ url_for('show_outbreak_details', bacteria=alert['bacteria'], antibiotic=alert['antibiotic'], month=alert['month_year']) }}">
+                            詳細グラフを見る
+                        </a>
+                    </p>
                 </div>
             {% endfor %}
         {% else %}

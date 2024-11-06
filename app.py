@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
 import pandas as pd
 from scipy.stats import zscore
 import os
 import openai
-from dotenv import load_dotenv  # dotenvをインポート
+from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
+import matplotlib.pyplot as plt
+import io
 
 # .envファイルの読み込み
 load_dotenv()
@@ -36,14 +38,13 @@ def generate_comment(alert):
     )
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # 利用可能なモデルに変更
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=100,
             temperature=0.7
         )
         return response['choices'][0]['message']['content'].strip()
     except openai.error.RateLimitError:
-        # クォータ制限を超えた場合のエラーメッセージ
         return "クォータ制限に達しました。コメントの生成ができませんでした。"
 
 @app.route('/')
@@ -69,7 +70,6 @@ def upload_file():
         
         outbreak_alerts = detect_outbreak_zscore(df)
         
-        # 各アラートに対してChatGPT APIでコメント生成
         for alert in outbreak_alerts:
             alert['comment'] = generate_comment(alert)
         
@@ -77,31 +77,50 @@ def upload_file():
     
     return redirect(request.url)
 
-@app.route('/api/upload', methods=['POST'])
-def api_upload():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+@app.route('/details/<bacteria>/<antibiotic>/<month>')
+def show_outbreak_details(bacteria, antibiotic, month):
+    month_period = pd.Period(month, 'M')
     
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+    # アップロードされたデータを読み込む
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], os.listdir(app.config['UPLOAD_FOLDER'])[0])
+    df = pd.read_csv(file_path)
+    df['date'] = pd.to_datetime(df['date'])
+    df['month_year'] = df['date'].dt.to_period('M')
     
-    if file and file.filename.endswith('.csv'):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        
-        df = pd.read_csv(file_path)
-        df['date'] = pd.to_datetime(df['date'])
-        
-        outbreak_alerts = detect_outbreak_zscore(df)
-        
-        for alert in outbreak_alerts:
-            alert['comment'] = generate_comment(alert)
-        
-        return jsonify({"outbreak_alerts": outbreak_alerts})
+    # 該当する細菌と薬剤のデータをフィルタリング
+    df_filtered = df[(df['bacteria'] == bacteria) & (df['antibiotic'] == antibiotic)]
     
-    return jsonify({"error": "Invalid file format. Only CSV files are allowed."}), 400
+    # 月別の検査数、陽性数、陽性率を計算
+    monthly_summary = df_filtered.groupby('month_year').agg(
+        test_count=('resistance', 'size'),
+        positive_count=('resistance', lambda x: (x == 'R').sum()),
+        positive_rate=('resistance', lambda x: (x == 'R').mean())
+    ).reset_index()
+    
+    # グラフの作成
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+    
+    ax1.set_title(f'Outbreak Details for {bacteria} with {antibiotic}')
+    ax1.set_xlabel('Month')
+    ax1.set_ylabel('Count')
+    
+    ax1.bar(monthly_summary['month_year'].astype(str), monthly_summary['test_count'], color='lightblue', label='Test Count')
+    ax1.bar(monthly_summary['month_year'].astype(str), monthly_summary['positive_count'], color='salmon', label='Positive Count', alpha=0.7)
+    
+    ax2 = ax1.twinx()
+    ax2.plot(monthly_summary['month_year'].astype(str), monthly_summary['positive_rate'], color='green', marker='o', label='Positive Rate')
+    ax2.set_ylabel('Positive Rate')
+    
+    fig.tight_layout()
+    fig.legend(loc="upper left")
+    
+    # グラフをバイトストリームとして保存
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close(fig)
+    
+    return send_file(img, mimetype='image/png')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
