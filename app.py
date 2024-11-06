@@ -90,6 +90,10 @@ def show_outbreak_details(bacteria, antibiotic, month):
     # 該当する細菌と薬剤のデータをフィルタリング
     df_filtered = df[(df['bacteria'] == bacteria) & (df['antibiotic'] == antibiotic)]
     
+    # 該当月のデータをフィルタリングして耐性率を計算
+    selected_month_data = df_filtered[df_filtered['month_year'] == month_period]
+    selected_month_resistance_rate = (selected_month_data['resistance'] == 'R').mean()
+
     # 月別の検査数、陽性数、陽性率を計算
     monthly_summary = df_filtered.groupby('month_year').agg(
         test_count=('resistance', 'size'),
