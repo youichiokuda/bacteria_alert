@@ -19,10 +19,19 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def detect_outbreak_zscore(df, z_threshold=2):
+    # 日付列の型変換
+    df['date'] = pd.to_datetime(df['date'])
     df['month_year'] = df['date'].dt.to_period('M')
-    resistance_rate = df.groupby(['bacteria', 'antibiotic', 'month_year'])['resistance'].apply(lambda x: (x == 'R').mean()).reset_index(name='resistance_rate')
+    
+    # "I" を "S" と同じ扱いにして耐性率を計算
+    resistance_rate = df.assign(
+        resistance=df['resistance'].replace('I', 'S')  # "I" を "S" に置換
+    ).groupby(['bacteria', 'antibiotic', 'month_year'])['resistance'].apply(lambda x: (x == 'R').mean()).reset_index(name='resistance_rate')
+    
+    # zスコアの計算
     resistance_rate['z_score'] = resistance_rate.groupby(['bacteria', 'antibiotic'])['resistance_rate'].transform(lambda x: zscore(x, nan_policy='omit'))
     
+    # zスコアが閾値を超えるものをアウトブレイクアラートとして検出
     outbreak_alerts = resistance_rate[resistance_rate['z_score'] > z_threshold].to_dict(orient='records')
     return outbreak_alerts
 
@@ -87,13 +96,10 @@ def show_outbreak_details(bacteria, antibiotic, month):
     df['date'] = pd.to_datetime(df['date'])
     df['month_year'] = df['date'].dt.to_period('M')
     
-    # 該当する細菌と薬剤のデータをフィルタリング
+    # 該当する細菌と薬剤のデータをフィルタリングし、"I" を "S" に置換
     df_filtered = df[(df['bacteria'] == bacteria) & (df['antibiotic'] == antibiotic)]
+    df_filtered['resistance'] = df_filtered['resistance'].replace('I', 'S')  # "I" を "S" に置換
     
-    # 該当月のデータをフィルタリングして耐性率を計算
-    selected_month_data = df_filtered[df_filtered['month_year'] == month_period]
-    selected_month_resistance_rate = (selected_month_data['resistance'] == 'R').mean()
-
     # 月別の検査数、陽性数、陽性率を計算
     monthly_summary = df_filtered.groupby('month_year').agg(
         test_count=('resistance', 'size'),
