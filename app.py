@@ -100,7 +100,7 @@ def show_outbreak_details(bacteria, antibiotic, month):
     # グラフの作成
     fig, ax1 = plt.subplots(figsize=(10, 6))
     
-    ax1.set_title(f'Outbreak Details for {bacteria} with {antibiotic}')
+    ax1.set_title(f'Outbreak Details for {bacteria} with {antibiotic} - {month}')
     ax1.set_xlabel('Month')
     ax1.set_ylabel('Count')
     

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>アラート結果</title>
     <style>
-        /* 基本設定 */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f6f9;
@@ -26,7 +25,6 @@
             text-align: center;
         }
 
-        /* カードスタイルのアラート */
         .alert-item {
             background-color: #fff;
             border-radius: 10px;
@@ -54,7 +52,6 @@
             color: #333;
         }
 
-        /* 詳細リンクボタン */
         .detail-link {
             margin-top: 15px;
             text-align: center;
@@ -75,7 +72,6 @@
             background-color: #45a049;
         }
 
-        /* フッターリンク */
         .footer-link {
             text-align: center;
             margin-top: 20px;
@@ -104,7 +100,6 @@
                     <p><strong>耐性率:</strong> {{ alert['resistance_rate'] }}</p>
                     <p><strong>Zスコア:</strong> {{ alert['z_score'] }}</p>
                     <p><strong>コメント:</strong> {{ alert['comment'] }}</p>
-                    <!-- 詳細リンク -->
                     <div class="detail-link">
                         <a href="{{ url_for('show_outbreak_details', bacteria=alert['bacteria'], antibiotic=alert['antibiotic'], month=alert['month_year']) }}">
                             詳細グラフを見る
@@ -112,14 +107,4 @@
                     </div>
                 </div>
             {% endfor %}
-        {% else %}
-            <p class="no-alerts">異常な増加は検出されませんでした。</p>
-        {% endif %}
-        
-        <!-- フッターのリンク -->
-        <div class="footer-link">
-            <a href="/">別のファイルをアップロード</a>
-        </div>
-    </div>
-</body>
-</html>
+       
